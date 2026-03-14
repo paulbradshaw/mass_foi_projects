@@ -21,3 +21,8 @@ A number of FOI requests can be found in the /foi-requests folder. You can use t
 ## Walkthrough steps
 
 TBC
+
+## Useful links and case studies
+
+* Hacks/Hackers: [Slow Down First. That’s How Newsrooms Move Faster With AI.](https://www.hackshackers.com/slow-down-first-thats-how-newsrooms-move-faster-with-ai/?ref=hacks-hackers-newsletter) - details a similar challenge: “The Connecticut Mirror worked with a large collection of legal documents that had been in their possession for some time, but they hadn’t been able to investigate due to the huge amount of manual review that would be required. Formats varied. Quality varied. Summarization seemed like the obvious answer. In fact, it was not, because it was not possible to collectively define what a useful summary would actually look like ... The Connecticut Mirror used AI to group the documents by the legal case they pertained to, bringing a more manageable order to the stack of documents"
+
