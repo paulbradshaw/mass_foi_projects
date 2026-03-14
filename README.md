@@ -24,5 +24,7 @@ TBC
 
 ## Useful links and case studies
 
+* Tim Green: [Vibe Coding Threatens Journalism: Why Newsrooms Need Governance Now](https://smarterarticles.co.uk/vibe-coding-threatens-journalism-why-newsrooms-need-governance-now) explores some of the ethical and security issues involved in vibe coding
+* Simon Willison: [Not all AI-assisted programming is vibe coding (but vibe coding rocks)](https://simonwillison.net/2025/Mar/19/vibe-coding/) - "I’m concerned that the definition is already escaping its original intent. I’m seeing people apply the term “vibe coding” to all forms of code written with the assistance of AI. I think that both dilutes the term and gives a false impression of what’s possible with responsible AI-assisted programming." 
 * Hacks/Hackers: [Slow Down First. That’s How Newsrooms Move Faster With AI.](https://www.hackshackers.com/slow-down-first-thats-how-newsrooms-move-faster-with-ai/?ref=hacks-hackers-newsletter) - details a similar challenge: “The Connecticut Mirror worked with a large collection of legal documents that had been in their possession for some time, but they hadn’t been able to investigate due to the huge amount of manual review that would be required. Formats varied. Quality varied. Summarization seemed like the obvious answer. In fact, it was not, because it was not possible to collectively define what a useful summary would actually look like ... The Connecticut Mirror used AI to group the documents by the legal case they pertained to, bringing a more manageable order to the stack of documents"
 
