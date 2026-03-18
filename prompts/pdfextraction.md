@@ -2,8 +2,13 @@
 
 ```
 # Objective: 
-To import data from multiple FOI responses to a question on crimes by category, outcome and name of hospital in each case, and clean it so that we have a single dataset in a common structure.
-That structure has the following columns:
+To import data from an FOI response containing data on crimes in hospitals and clean it so that we have a single dataset in a common structure.
+The order of priority is as follows: ideally data which shows every crime, its category, outcome and location.
+But if this is not in the response, we want any table showing total crimes by category for each year - or for all years.
+If that isn't provided, total crimes by hospital and year - or for all years.
+If that isn't provided, total crimes by outcome and year - or for all years.
+
+We want to structure the data into a table with the following columns:
 
 Filename
 Sheet name
@@ -22,8 +27,8 @@ Month (where specified. If not specified, say ‘NOT SPECIFIED’). This might b
 # Task
 Look at the attached PDF and suggest Python code that will work in Colab notebook. It should: 
 
-Import the PDF 
-Identify which pages contain tables of data that contain data on crimes by hospital. Ideally this will also contain the category of crime and/or outcome, but in some situations those will be in separate tables. If that is the case, focus only on the crimes by category table(s). If no breakdown by category is provided, focus only on the totals by hospital. If no breakdown by hospital or category is provided, focus on the totals by outcome.
+Import the PDF
+Identify the pages with data to extract. Follow this order of priority: 1) Data on crimes by hospital. Ideally this will also contain the category of crime and/or outcome, but in some situations those will be in separate tables. If that is the case, focus only on the crimes by category table(s). If no breakdown by category is provided, focus only on the totals by hospital. If no breakdown by hospital or category is provided, focus on the totals by outcome.
 Extract that data into a series of dataframes. Note that tables which continue into subsequent pages will start with a row of data, rather than the headings. 
 convert it into a single dataframe with headings from the first table (because where tables continue into subsequent pages they won’t have the headings on them)
 Clean the dataframe to use the field headings from that table, and remove any rows before that data, and 
