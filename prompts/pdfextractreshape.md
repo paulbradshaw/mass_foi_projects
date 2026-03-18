@@ -1,4 +1,4 @@
-# Prompt template: generate code for PDF data extraction and cleaning
+# Prompt template: generate code for PDF data extraction and reshaping
 
 ```
 # Objective: 
