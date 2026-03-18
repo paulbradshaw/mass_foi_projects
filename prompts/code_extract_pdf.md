@@ -27,7 +27,7 @@ Look at the attached PDF and suggest Python code that will work in Colab noteboo
 
 1. Import the PDF
 2. Identify the pages with data to extract. Follow this order of priority: 1) Detailed data on each individual crime, including information on category, outcome and/or location; 2) Aggregate data on crimes by category; 3) crimes by hospital; 4) crimes by outcome.
-3. Extract that data into a series of dataframes. Note that tables which continue into subsequent pages will start with a row of data, rather than the headings. 
+3. Extract that data into a series of dataframes. Store the force, filename and page number(s) in extra columns. Note that tables which continue into subsequent pages will start with a row of data, rather than the headings. 
 4. Convert it into a single dataframe with headings from the first table (because where tables continue into subsequent pages they won’t have the headings on them)
 5. Clean the dataframe to use the field headings from that table, and remove any rows before that data, and 
 6. Export as a CSV
