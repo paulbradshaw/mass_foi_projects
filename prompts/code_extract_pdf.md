@@ -39,10 +39,17 @@ Here is the structure of the tables in the PDF.
 The table appears on page XXX under question XXX and continues onto the first part of page XXX
 In the PDF there are grid lines between the rows and columns in the table.
 The first column is XXXXX, then there are XX columns for each year, and a grand total column
-In the PDF the hospital name sits above the table so there is a gridline below the name of the hospital but not above or beside.
 [PASTE EXTRACT]
 
 ## Extra details
 
 [INCLUDE ANY EXTRA INFORMATION HERE]
 ```
+
+## Examples of descriptions and extra details
+
+`In the PDF the hospital name sits above the table so there is a gridline below the name of the hospital but not above or beside.`
+
+`Nottinghamshire: in this response the police force has provided a separate table for each hospital. Each table contains a first column titled ‘year’ with the categories of crime in the rows underneath, then five columns with figures for each of five financial years. The name of the hospital appears just above the table.`
+
+`Ignore the outcomes tables that come immediately after each of those. `
