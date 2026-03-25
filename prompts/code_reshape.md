@@ -36,3 +36,31 @@ Provide the code in two blocks: the first block to upload the file, and the seco
 Comment the code thoroughly so that it is easy for a non-coder to understand. Avoid jargon.
 Simple but longer code is preferable to shorter more complex code, if simple code is easier to understand.
 ```
+
+## Optional: include location and/or structure information
+
+You might include extra information about the structure, like so:
+
+```
+## LOCATION/STRUCTURE OF DATA
+
+The table appears on page 2 under question 1b and continues onto the first part of p3
+In the PDF there are grid lines between the rows and columns in the table.
+The first column is Offence sub group, then there are five columns for each year, and a grand total column
+Here is the structure of the tables in the PDF:
+[PASTE EXTRACT IF POSSIBLE]
+```
+
+## Optional: include extra information
+
+Sometimes a PDF might be include data around the table rather than inside it, or you need to provide other extra information about elements to grab or ignore. 
+
+Add this information to the end of your prompt like so:
+
+```
+## EXTRA DETAILS
+
+Nottinghamshire: in this response the police force has provided a separate table for each hospital. Each table contains a first column titled ‘year’ with the categories of crime in the rows underneath, then five columns with figures for each of five financial years. The name of the hospital appears just above the table.
+Grab each table including the name of the hospital above it. Put this in a column called ‘hospital’
+Ignore the outcomes tables that come immediately after each of those. 
+```
