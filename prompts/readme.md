@@ -6,3 +6,4 @@ This folder contains prompts and prompt templates from the session.
 * [Prompt template for generating Python code to extract data from a PDF](https://github.com/paulbradshaw/mass_foi_projects/blob/main/prompts/code_extract_pdf.md) using Colab
 * [Template for generating code to reshape data from an FOI response](https://github.com/paulbradshaw/mass_foi_projects/blob/main/prompts/code_reshape.md)
 * [Template for generating code to extract *and* reshape data from a PDF](https://github.com/paulbradshaw/mass_foi_projects/blob/main/prompts/code_pdf_extract_reshape.md)
+* [Template for checking extracted and reshaped data against the original PDF](https://github.com/paulbradshaw/mass_foi_projects/blob/main/prompts/checking.md)
