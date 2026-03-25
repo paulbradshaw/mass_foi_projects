@@ -18,6 +18,8 @@ By the end of this session attendees should be able to design a data structure f
 
 A number of FOI requests can be found in the /foi-requests folder. You can use these to test the processes outlined in this repo.
 
+* [Data validation checklist template](https://docs.google.com/document/d/1uQZ6dpAIpPwABLkLotBiQucXXFye7X48Q-woA3QBBLU/edit?usp=sharing)
+
 ## Walkthrough steps
 
 TBC
