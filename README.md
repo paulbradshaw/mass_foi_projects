@@ -8,7 +8,7 @@ No prior knowledge is required.
 
 You will need a laptop with Google Drive and an account with an AI tool such as ChatGPT, Gemini, Claude or Copilot. 
 
-Tableau and Open Refine are optional but will help you with many of the challenges involved.
+Tabula and Open Refine are optional but will help you with many of the challenges involved.
 
 ## Objectives
 
