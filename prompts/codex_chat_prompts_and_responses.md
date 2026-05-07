@@ -1,6 +1,10 @@
-# Chat Prompts and Responses
+# ChatGPT Codex transcript
 
-This transcript records the user prompts and assistant responses from the FOI hospital crimes data-cleaning chat. Tool output and raw terminal logs are omitted.
+Codex is an AI 'agent' that runs on ChatGPT, available on the Pro plan and downloaded as a separate app. 
+
+This transcript records prompts and responses used to see how it performed on a pure vibe coding approach to combining the FOI hospital crimes data. Tool output and raw terminal logs are omitted.
+
+The ultimate result was missing 100,000 incidents and ten police forces when compared to the actual responses, and is used to demonstrate the pitfalls of a pure vibe coding approach without systematic monitoring and checks.
 
 ---
 
