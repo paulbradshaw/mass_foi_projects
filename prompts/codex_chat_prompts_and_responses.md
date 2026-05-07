@@ -4,7 +4,13 @@ Codex is an AI 'agent' that runs on ChatGPT, available on the Pro plan and downl
 
 This transcript records prompts and responses used to see how it performed on a pure vibe coding approach to combining the FOI hospital crimes data. Tool output and raw terminal logs are omitted.
 
-The ultimate result was missing 100,000 incidents and ten police forces when compared to the actual responses, and is used to demonstrate the pitfalls of a pure vibe coding approach without systematic monitoring and checks.
+When compared to the actual responses, the vibe coding result was:
+
+* Missing 100,000 incidents, roughly half of the total
+* Missing one third of police forces (10)
+* Missing incidents for over half of the remaining police forces (13 of 20)
+
+As a result this approach is not recommended.
 
 ---
 
