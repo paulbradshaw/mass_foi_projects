@@ -47,7 +47,7 @@ If any uncertainty remains (e.g., an OCR-confused label), include a “flags” 
 
 Rather than extract the table in the AI tool, which raises verification challenges and issues around explainability, it may be preferable to extract it using code. Code allows you to see exactly *how* the table is extracted, to explain that to others, and to identify any potential problems.
 
-Below is an example of a prompt template designed to generate Python code that can be copied and pasted into a Colab notebook in Google Drive. 
+Below is an example of a prompt template designed to generate Python code that can be copied and pasted into a [Colab notebook in Google Drive](https://colab.research.google.com/). 
 
 Although the prompt relates to an FOI response about hospital crime, it can be adapted for other responses. 
 
@@ -91,7 +91,7 @@ The first column is XXXXX, then there are XX columns for each year, and a grand 
 [INCLUDE ANY EXTRA INFORMATION HERE]
 ```
 
-## Examples of descriptions and extra details
+### Examples of descriptions and extra details
 
 `In the PDF the hospital name sits above the table so there is a gridline below the name of the hospital but not above or beside.`
 
@@ -99,3 +99,16 @@ The first column is XXXXX, then there are XX columns for each year, and a grand 
 
 `Ignore the outcomes tables that come immediately after each of those. `
 
+## Running the code in Google Colab
+
+Once the AI tool provides the code you asked for, do the following:
+
+1. Copy the code - there should be a button just above each code block to automatically copy it
+2. Create a new Colab notebook at https://colab.research.google.com/
+3. A new notebook will appear, with one empty code block. Paste the code you copied into that block.
+4. Click the 'play/run' button to the left of the code block to run that code. It will take a few moments at first to connect to a remote server, but will run faster after that.
+5. Look for an 'upload' button appearing underneath the code block, and click on that to upload the files that you are extracting data from.
+6. If more than one block of code was provided, create another code block for each one, then copy and paste each block of code from your AI response into a code block in Colab. Run each code block in turn.
+7. If you get any errors, you can either paste these back into your original AI conversation to ask for a fix, or you can use Colab's built-in AI which will offer to debug it for you.
+
+*Note: Google Colab runs on a remote computer, so after a period of inactivity, or if you close the window, it will disconnect. When you return to the notebook you will have to run it from the start, and upload files etc. again.*
