@@ -25,4 +25,8 @@ In Claude this can take the form of a **skill**: [find out how to create that he
 
 In ChatGPT you can create a **custom GPT**. 
 
-Skills have the advantage of being sharable as markdown files, whereas custom GPTs can be public-facing tools.
+In Google Gemini you can create a **Gem**.
+
+Skills have the advantage of being sharable as markdown files ([here's one generated based on cleaning police crime categories](https://github.com/paulbradshaw/mass_foi_projects/blob/main/prompts/skill.md)). Custom GPTs and Google Gems can be public-facing tools. 
+
+Gems have the advantage of being free to create at the moment, whereas you need a paid account to create a custom GPT or skill. However, you can pay while creating a custom GPT and, once complete, it will continue to work after you stop paying (you just can't edit it until you upgrade again). 
