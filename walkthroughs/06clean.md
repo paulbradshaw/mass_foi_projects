@@ -17,7 +17,7 @@ Look for spreadsheets that use official categories - in particular those which m
 
 An example is in the [files folder](https://github.com/paulbradshaw/mass_foi_projects/tree/main/files)
 
-## Creating a skill to clean future data
+## Creating a skill, custom GPT or gem to clean future data
 
 Once you've cleaned the dataset you can turn the two lists - the dirty and clean version of each category - into a tool for cleaning future data.
 
@@ -30,3 +30,5 @@ In Google Gemini you can create a **Gem**.
 Skills have the advantage of being sharable as markdown files ([here's one generated based on cleaning police crime categories](https://github.com/paulbradshaw/mass_foi_projects/blob/main/prompts/skill.md)). Custom GPTs and Google Gems can be public-facing tools. 
 
 Gems have the advantage of being free to create at the moment, whereas you need a paid account to create a custom GPT or skill. However, you can pay while creating a custom GPT and, once complete, it will continue to work after you stop paying (you just can't edit it until you upgrade again). 
+
+Also available in Claude are **projects** which retain custom instructions and files and allow you to have multiple new conversations within that 'project' context. The same information from the skill could be used within a project.
