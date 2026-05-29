@@ -16,3 +16,13 @@ With some of these problems you will need a 'master' list of terms (e.g. officia
 Look for spreadsheets that use official categories - in particular those which map sub-categories to their parent categories, and include any codes used as well. There's a good chance that some responses will use both top-level categories, others sub-categories and others codes. 
 
 An example is in the [files folder](https://github.com/paulbradshaw/mass_foi_projects/tree/main/files)
+
+## Creating a skill to clean future data
+
+Once you've cleaned the dataset you can turn the two lists - the dirty and clean version of each category - into a tool for cleaning future data.
+
+In Claude this can take the form of a **skill**: [find out how to create that here](https://claude.com/blog/how-to-create-skills-key-steps-limitations-and-examples). 
+
+In ChatGPT you can create a **custom GPT**. 
+
+Skills have the advantage of being sharable as markdown files, whereas custom GPTs can be public-facing tools.
