@@ -53,3 +53,7 @@ Provide the code in two blocks: the first block to upload the file, and the seco
 Comment the code thoroughly so that it is easy for a non-coder to understand. Avoid jargon.
 Simple but longer code is preferable to shorter more complex code, if simple code is easier to understand.
 ```
+
+## Combining the resulting CSVs
+
+Once all the extracted data has been reshaped it should be straightforward to combine. Open Refine is one tool that can do this (upload all the CSVs and then export as a single CSV) or you can [make a copy of this Colab notebook](https://colab.research.google.com/drive/11uki1cgrtf-nPGLAIrnkBGOdwMw11RSL?usp=sharing) and run it - it will combine any CSVs that you upload.
