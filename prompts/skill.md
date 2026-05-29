@@ -1,8 +1,51 @@
+---
+name: foi-classifier
+description: Standardise inconsistent offence and incident categories from Freedom of Information (FOI) responses. Use when users need to classify, map, or standardise crime/incident categories from multiple public bodies with varying levels of granularity. Handles messy data including spelling variations, combined offences, legal references, and maps to Home Office/ONS taxonomy hierarchies. Trigger this skill whenever the user mentions FOI data, crime categories, offence classification, or wants to standardise police/incident data — even if they don't use the word "classify".
+---
+
 # FOI Category Classification Skill
 
 ## Purpose
 
 Standardise inconsistent offence and incident categories from FOI responses across different public bodies. Different organisations report at different levels of granularity (top-level categories vs sub-categories vs specific offence descriptions), with spelling variations, combined offences, and embedded legal references.
+
+## Taxonomy Reference
+
+The taxonomy is **bundled with this skill** — no user upload required.
+
+**File:** `references/notifiable_offences.csv` (relative to this SKILL.md)
+
+**Columns:**
+- `Class` — top-level category (e.g., "Violence Against The Person", "Sexual Offences")
+- `Sub class` — sub-category (e.g., "Homicide", "Violence with injury")
+- `Offence category` — code-prefixed category (e.g., "1 Murder", "8S Assault with injury on a constable")
+- `Offence` — specific offence description
+- `Act` — legislation name
+- `Section` — section number
+- `Home Office code` — offence code (e.g., "001/01", "8F")
+- `Current` — all rows are "Y" (current); no filtering needed
+
+**Top-level Classes (12 total):**
+- Violence Against The Person
+- Sexual Offences
+- Robbery
+- Burglary
+- Theft
+- Vehicle offences
+- Arson and Criminal Damage
+- Drug Offences
+- Possession of weapons
+- Public Order Offences
+- Miscellaneous Crimes Against Society
+- NFIB Fraud
+
+Load the taxonomy at the start of every classification task:
+
+```python
+import pandas as pd
+
+taxonomy = pd.read_csv('references/notifiable_offences.csv')
+```
 
 ## When to Use This Skill
 
@@ -16,59 +59,36 @@ Trigger this skill when the user:
 
 ## Input Requirements
 
-The user should provide:
-1. **FOI data file(s)**: CSV, Excel, or PDF containing offence/incident categories
-2. **Taxonomy reference documents**: Home Office and/or ONS spreadsheets showing category hierarchies, sub-categories, and offence descriptions
-
-**Common taxonomy files:**
-- `categoryLOOKUPTOMATCH.csv`: Maps offence codes to ONS categories with old/new category structures
-- `notifiableoffencesLOOKUP.csv`: Detailed notifiable offences with class, sub-class, category, specific offence descriptions, Acts and sections
+The user provides **only their FOI data file(s)** — CSV, Excel, or PDF containing offence/incident categories. The taxonomy is already bundled.
 
 ## Workflow
 
-### Step 1: Parse Taxonomy Reference Documents
+### Step 1: Load the Taxonomy
 
-First, extract and understand the classification structure from the reference documents:
+Read `references/notifiable_offences.csv` and build lookup structures:
 
-1. Read the taxonomy files (Home Office/ONS spreadsheets)
-2. Identify the hierarchical structure based on the file type:
+```python
+import pandas as pd
 
-**For categoryLOOKUPTOMATCH.csv:**
-   - Offence Code (e.g., "1", "8F", "19C")
-   - Offence description (human-readable name)
-   - Old PRC offence group / Old offence sub-group (legacy categories)
-   - **New ONS offence group / New ONS sub-offence group** (current taxonomy - use these for standardisation)
-   
-**For notifiableoffencesLOOKUP.csv:**
-   - Class (top level, e.g., "Violence Against The Person")
-   - Sub class (e.g., "Homicide", "Violence with injury")
-   - Offence category (code-based category, e.g., "1 Murder", "8S Assault with injury on a constable")
-   - Offence (specific offence description)
-   - Act (legislation name)
-   - Section (section number)
+taxonomy = pd.read_csv('references/notifiable_offences.csv')
 
-3. Build an internal mapping structure that includes:
-   - Hierarchical relationships (Class → Sub-class → Category → Offence)
-   - Offence codes and their descriptions
-   - Alternative names and variations
-   - Legislation references (Acts and sections)
-   - Both old and new category systems for backward compatibility
+# Build lookup sets for matching
+classes = set(taxonomy['Class'].dropna().str.strip().unique())
+sub_classes = set(taxonomy['Sub class'].dropna().str.strip().unique())
+offence_categories = taxonomy['Offence category'].dropna().str.strip().tolist()
+offences = taxonomy['Offence'].dropna().str.strip().tolist()
 
-**Key considerations:**
-- Taxonomy files may have multiple sheets - check all sheets
-- notifiableoffencesLOOKUP has very detailed offence descriptions - use for exact matching
-- categoryLOOKUPTOMATCH has simpler descriptions and codes - good for fuzzy matching
-- Some offence codes appear multiple times with slight variations (e.g., 8H, 8J, 8K)
-- Look for patterns: codes like "19C", "19D", "19E" are variations of the same offence type
-- Prioritise "New ONS" categories over "Old PRC" categories for modern standardisation
+# Build code-to-row lookup (Home Office codes like "001/01", "8F")
+code_lookup = taxonomy.dropna(subset=['Home Office code']).set_index('Home Office code')
+```
 
 ### Step 2: Analyse FOI Data
 
 Examine the FOI data files to understand their structure:
 
 1. Identify which column(s) contain category/offence information
-2. Assess the level of granularity used (top-level, sub-category, or specific offences)
-3. Identify patterns in the data:
+2. Assess the level of granularity (top-level, sub-category, or specific offences)
+3. Identify patterns:
    - Spelling variations or typos
    - Combined/multiple offences in single entries (e.g., "Theft and Criminal Damage")
    - Embedded legal references (e.g., "S.4 Public Order Act 1986")
@@ -79,195 +99,131 @@ Examine the FOI data files to understand their structure:
 
 For each entry in the FOI data:
 
-1. **Clean and normalise** the input:
-   - Standardise capitalisation
-   - Remove extra whitespace
-   - Extract any embedded legal references
-   - Extract offence codes if present (e.g., "8F", "19C", "105A")
+**1. Clean and normalise the input:**
+- Standardise capitalisation
+- Strip extra whitespace
+- Extract any embedded legal references
+- Extract offence codes if present (e.g., "8F", "001/01")
 
-2. **Identify likely top-level category using keyword clustering**:
-   
-   Certain keywords are strong indicators of the top-level category:
-   
-   **Sexual Offences indicators:**
-   - rape, sexual assault, sexual activity, indecent, pornographic, grooming, abuse of position
-   - These words ONLY appear in sexual offences category
-   
-   **Violence Against The Person indicators:**
-   - murder, manslaughter, assault, ABH, GBH, wounding, strangulation, threatening, harassment, stalking
-   - High correlation with violence category
-   
-   **Theft Offences indicators:**
-   - burglary, theft, shoplifting, robbery, stolen, taking without consent, TWOC
-   - Exclusively or primarily in theft category
-   
-   **Drug Offences indicators:**
-   - drug, cannabis, cocaine, heroin, amphetamine, possession, supply, production, trafficking, controlled substance
-   - Only in drug offences category
-   
-   **Criminal Damage indicators:**
-   - arson, damage, criminal damage, destroy, graffiti
-   - Only in criminal damage category
-   
-   **Weapons indicators:**
-   - firearms, weapon, knife, blade, offensive weapon, possession of
-   - Only in weapons category
-   
-   Use this for:
-   - **Confidence boosting**: If fuzzy match suggests Category X and keywords confirm Category X, increase confidence
-   - **Validation**: If match suggests Category X but keywords strongly indicate Category Y, flag for review
-   - **Generic term handling**: If input is just "DRUG OFFENCES" and contains drug keywords, confirm it's a category-level input
-   - **Disambiguation**: When multiple matches possible, prefer the one matching keyword cluster
+**2. Identify likely top-level category using keyword clustering:**
 
-3. **Identify if combined offences** exist:
-   - Look for conjunctions: "and", "&", "+"
-   - Look for separators: "/", ",", ";"
-   - Note: Some codes use "/" internally (e.g., "1/4.1/4.2") - don't split these
-   - If combined, split and map each separately
+Certain keywords are strong indicators:
 
-3. **Map to taxonomy** using this priority order:
-   
-   **a) Check if input is a category-level term** (not a specific offence):
-      - Compare cleaned input against top-level category names
-      - Categories: "Sexual Offences", "Violence Against The Person", "Theft Offences", "Drug Offences", "Criminal Damage", "Robbery", "Public Order Offences", etc.
-      - If high similarity (>0.8) to a category name, mark as "CATEGORY-LEVEL INPUT"
-      - Return: (matched_category, "CATEGORY-LEVEL", "No specific offence - category classification only", None, 0.90, "Input is a category header, not a specific offence")
-      - Add flag: `is_category_level_input = TRUE`
-      - This is NOT an error - it's correct identification that more specificity is needed
-      - **Also check keyword clustering**: If input is generic like "THEFT" but contains theft keywords, treat as category-level
-   
-   **b) Offence code match** (highest priority for specific offences):
-      - Extract any codes in the format: numbers, letters, or combinations (e.g., "8F", "19C", "105A")
-      - Look up in categoryLOOKUPTOMATCH by "Offence Code" column
-      - If found, use the "New ONS offence group" and "New ONS sub-offence group"
-   
-   **b) Exact match on offence description**:
-      - Match against "Offence" column in notifiableoffencesLOOKUP
-      - Match against "Offence description" in categoryLOOKUPTOMATCH
-   
-   **c) Legislation-based match**:
-      - If input contains Act name and section (e.g., "Public Order Act 1986 S.4")
-      - Look up in notifiableoffencesLOOKUP by Act and Section columns
-      - Return the Class and Sub-class
-   
-   **d) Fuzzy match on descriptions**:
-      - Try fuzzy matching against offence descriptions
-      - Match against "Offence category" in notifiableoffencesLOOKUP (e.g., "8S Assault with injury on a constable")
-   
-   **e) Category-level match**:
-      - Match against Class/Sub-class in notifiableoffencesLOOKUP
-      - Match against New ONS offence group/sub-offence group in categoryLOOKUPTOMATCH
-   
-   **f) Semantic match**:
-      - Understand meaning and match to closest category using context
+| Category | Keywords |
+|---|---|
+| Sexual Offences | rape, sexual assault, sexual activity, indecent, pornographic, grooming, abuse of position |
+| Violence Against The Person | murder, manslaughter, assault, ABH, GBH, wounding, strangulation, threatening, harassment, stalking |
+| Theft | burglary, theft, shoplifting, robbery, stolen, taking without consent, TWOC |
+| Drug Offences | drug, cannabis, cocaine, heroin, amphetamine, possession, supply, production, trafficking, controlled substance |
+| Arson and Criminal Damage | arson, damage, criminal damage, destroy, graffiti |
+| Possession of weapons | firearms, weapon, knife, blade, offensive weapon |
 
-4. **Assign confidence score**:
-   - Very High (0.95-1.0): Offence code match or exact description match
-   - High (0.90-0.94): Category-level match, legislation-based match (Act + Section)
-   - High with keyword boost (add 0.05-0.10): Fuzzy match where keywords confirm the category
-   - Medium (0.7-0.89): Good fuzzy match or category-level match
-   - Medium (0.6-0.69): Weaker fuzzy match or semantic match
-   - Low with keyword conflict (reduce 0.10-0.20): Match suggests Category X but keywords indicate Category Y
-   - Low (0.0-0.59): Uncertain mapping requiring review
+Use keyword clustering to:
+- Boost confidence when fuzzy match and keywords agree
+- Flag for review when they disagree
+- Disambiguate when multiple matches are possible
+- Confirm category-level inputs (e.g., input is just "DRUG OFFENCES")
 
-5. **Apply keyword validation**:
-   - If matched category contradicts keyword clustering, flag for review
-   - If matched category confirms keyword clustering, boost confidence slightly
-   - If input contains exclusive keywords (e.g., "rape" only in sexual offences), use for disambiguation
+**3. Detect combined offences:**
+- Look for conjunctions: "and", "&", "+"
+- Look for separators: "/", ",", ";"
+- Note: Some codes use "/" internally (e.g., "001/01") — don't split these
+- If combined, split and map each part separately
 
-6. **Extract information**:
-   - Offence code (if present)
-   - Legal references: Act names and section numbers
-   - Both old and new category systems (for reference)
+**4. Map to taxonomy using this priority order:**
 
-### Step 4: Create Output
+**a) Category-level match** — check if input is a top-level or sub-level term, not a specific offence:
+- Compare against `Class` values (similarity > 0.8) → mark `is_category_level_input = TRUE`
+- Return: `(matched_class, "CATEGORY-LEVEL", "No specific offence — category classification only", None, 0.90)`
+- This is correct behaviour, not an error
 
-Generate an Excel/CSV file with the original data PLUS new columns:
+**b) Home Office code match** (highest priority for specific offences):
+- Extract codes in format: digits, letters, or combinations (e.g., "8F", "001/01")
+- Look up in `code_lookup` by `Home Office code` column
+- If found, return `Class`, `Sub class`, `Offence category`
 
-**Core Classification Columns:**
-1. `offence_code` - Extracted offence code (e.g., "8F", "19C") if present
-2. `standardised_category_level1` - Top-level category from taxonomy (always populated)
-3. `standardised_category_level2` - Sub-category from taxonomy (if identified)
-4. `standardised_offence` - Specific offence description from taxonomy (if identified)
+**c) Exact match on offence description:**
+- Match cleaned input against `Offence` column
+- Also try against `Offence category` column
 
-**Confidence and Quality Columns:**
-5. `confidence_score` - Mapping confidence (0.0 to 1.0)
-6. `mapping_notes` - Explanation of mapping decisions, flags for review
-7. `extracted_legislation` - Any legal references found (Act and Section)
+**d) Legislation-based match:**
+- If input contains Act name and section (e.g., "Public Order Act 1986 S.4")
+- Filter taxonomy by `Act` and `Section` columns
+- Return `Class` and `Sub class`
 
-**Category Level Analysis Columns:**
-8. `input_category_level` - Detected level: "TOP_LEVEL", "MID_LEVEL", "BOTTOM_LEVEL", or "UNKNOWN"
-9. `category_level_confidence` - Confidence in level detection (0.0 to 1.0)
-10. `can_allocate_to_top_level` - Boolean: Can this be reliably assigned to a top-level category? (TRUE/FALSE)
-11. `allocation_certainty` - How certain is the top-level allocation: "CERTAIN", "PROBABLE", "AMBIGUOUS"
+**e) Fuzzy match on descriptions:**
+- Fuzzy match against `Offence`, `Offence category` columns
+- Use keyword clustering to disambiguate
 
-**Multi-Category Detection Columns:**
-12. `is_combined_offence` - Boolean flag if multiple offences detected
-13. `contains_multiple_top_categories` - Boolean: Do the combined offences span different top-level categories?
-14. `needs_manual_untangling` - Boolean: Requires human review to separate properly
+**f) Semantic match:**
+- Understand meaning and map to closest category using context
 
-**Additional Context Columns:**
-15. `keyword_cluster_detected` - Which keyword cluster was identified
-16. `original_category_cleaned` - Normalised version of original input
-17. `old_category_system` - Old PRC categories (for reference/backward compatibility)
+**5. Assign confidence score:**
 
-**Category Level Detection Logic:**
+| Score | Meaning |
+|---|---|
+| 0.95–1.0 | Home Office code match or exact description match |
+| 0.90–0.94 | Category-level match, legislation-based match (Act + Section) |
+| +0.05–0.10 boost | Fuzzy match where keywords confirm category |
+| 0.70–0.89 | Good fuzzy match or category-level match |
+| 0.60–0.69 | Weaker fuzzy match or semantic match |
+| −0.10–0.20 penalty | Match suggests Category X but keywords indicate Category Y |
+| 0.0–0.59 | Uncertain — flag for review |
 
-**TOP_LEVEL identification:**
-- Input matches or closely resembles a top-level category name (e.g., "Sexual Offences", "Violence Against The Person")
-- No specific offence details present
-- Contains only generic category keywords
-- `can_allocate_to_top_level = TRUE`, `allocation_certainty = CERTAIN`
+**6. Extract information:**
+- Home Office code (if present)
+- Legal references: Act names and section numbers
+- Input specificity level (see Step 4)
 
-**MID_LEVEL identification:**
-- Input matches a sub-category (e.g., "Violence with injury", "Domestic burglary", "Rape")
-- More specific than top-level but not a detailed offence
-- Can allocate to top-level with high confidence
-- `can_allocate_to_top_level = TRUE`, `allocation_certainty = CERTAIN` or "PROBABLE"
+### Step 4: Classify Input Specificity
 
-**BOTTOM_LEVEL identification:**
-- Input is a specific offence description (e.g., "Assault occasioning actual bodily harm", "Burglary in a dwelling")
-- Contains detailed offence characteristics
-- Maps through hierarchy to both sub-category and top-level
-- `can_allocate_to_top_level = TRUE`, `allocation_certainty = CERTAIN`
+Determine how specific the input is:
 
-**UNKNOWN identification:**
-- Cannot determine specificity level
-- May be abbreviated, truncated, or ambiguous
-- `can_allocate_to_top_level` depends on whether any category can be inferred
-- `allocation_certainty = AMBIGUOUS`
+| Level | Description | Example |
+|---|---|---|
+| `TOP_LEVEL` | Matches a top-level Class name; no specific offence details | "Sexual Offences" |
+| `MID_LEVEL` | Matches a sub-category | "Violence with injury", "Domestic burglary" |
+| `BOTTOM_LEVEL` | Specific offence description | "Assault occasioning actual bodily harm" |
+| `UNKNOWN` | Abbreviated, truncated, or ambiguous | — |
 
-**Combined Category Detection:**
+For all levels: `can_allocate_to_top_level = TRUE` unless input is completely unrecognisable.
 
-For entries like "Theft and Criminal Damage":
-1. Detect that multiple offences present (`is_combined_offence = TRUE`)
-2. Map each component to top-level category
-3. If components map to SAME top-level (e.g., both are theft offences):
-   - `contains_multiple_top_categories = FALSE`
-   - `needs_manual_untangling = FALSE`
-   - Can be allocated to single top-level category
-4. If components map to DIFFERENT top-levels (e.g., "Theft" and "Criminal Damage"):
-   - `contains_multiple_top_categories = TRUE`
-   - `needs_manual_untangling = TRUE` 
-   - Cannot allocate to single top-level category - requires separation
+`allocation_certainty` values: `CERTAIN`, `PROBABLE`, `AMBIGUOUS`
 
-**Output approach for combined offences spanning multiple top categories:**
-- **Option A (Recommended):** Create separate rows for each component with flag indicating they're from the same source entry
-- **Option B:** Single row with primary category + notes listing all categories involved
-- Flag clearly that manual intervention needed to separate the data properly
+**Combined offences spanning multiple top-level categories:**
+- Preferred: create one row per component, flagged as combined
+- Alternative: single row with primary category + notes
+- Always flag that manual intervention may be needed
 
-**For combined offences:**
-- Create one row per offence component
-- Mark with `is_combined_offence = TRUE`
-- Include reference to original combined entry in notes
+### Step 5: Output
 
-**Flag for review when:**
-- Confidence score < 0.6
-- No reasonable match found in taxonomy
-- Ambiguous mapping (multiple possible matches)
-- Unusual formatting or unexpected content
+Produce an Excel or CSV file preserving **all original columns**, with these added to the right:
 
-### Step 5: Summary Report
+| Column | Description |
+|---|---|
+| `matched_class` | Top-level ONS/Home Office category |
+| `matched_sub_class` | Sub-category |
+| `matched_offence_category` | Code-prefixed offence category |
+| `matched_offence` | Specific offence description |
+| `home_office_code` | Home Office code if matched |
+| `matched_act` | Legislation Act |
+| `matched_section` | Section number |
+| `confidence_score` | 0.0–1.0 |
+| `match_method` | e.g., "code_match", "exact", "fuzzy", "legislation", "semantic" |
+| `input_specificity` | TOP_LEVEL / MID_LEVEL / BOTTOM_LEVEL / UNKNOWN |
+| `can_allocate_to_top_level` | TRUE / FALSE |
+| `allocation_certainty` | CERTAIN / PROBABLE / AMBIGUOUS |
+| `is_combined_offence` | TRUE / FALSE |
+| `contains_multiple_top_categories` | TRUE / FALSE |
+| `needs_manual_untangling` | TRUE / FALSE |
+| `flag_for_review` | TRUE / FALSE |
+| `review_reason` | Why flagged (if applicable) |
+| `keyword_cluster_detected` | Which keyword cluster was identified |
+| `original_category_cleaned` | Normalised version of original input |
+
+For Excel output, include a "README" sheet explaining columns and confidence scoring.
+
+### Step 6: Summary Report
 
 Provide a brief summary including:
 - Total entries processed
@@ -275,44 +231,35 @@ Provide a brief summary including:
 - Number of uncertain mappings flagged for review
 - Common spelling variations detected
 - Number of combined offences split
-- Any categories from FOI data not found in taxonomy (potential new categories)
+- Any categories from FOI data not found in taxonomy
 
 ## Technical Implementation
 
 ### Reading Files
 
-**For Excel/CSV:**
 ```python
 import pandas as pd
-import openpyxl
 
-# Read taxonomy
-taxonomy_df = pd.read_excel('taxonomy.xlsx', sheet_name=None)  # Read all sheets
+# Load taxonomy (bundled)
+taxonomy = pd.read_csv('references/notifiable_offences.csv')
 
-# Read FOI data
-foi_data = pd.read_csv('foi_data.csv')  # or pd.read_excel()
+# Load FOI data (user-provided)
+foi_data = pd.read_csv('foi_data.csv')        # or
+foi_data = pd.read_excel('foi_data.xlsx')
 ```
-
-**For PDF:**
-Use PDF extraction tools to convert to structured data first, then process as CSV.
 
 ### Fuzzy Matching
 
-Use string similarity for handling variations:
 ```python
-from difflib import SequenceMatcher
-from fuzzywuzzy import fuzz  # or rapidfuzz
+from rapidfuzz import fuzz  # prefer rapidfuzz over fuzzywuzzy
 
-def fuzzy_match(input_str, taxonomy_entries, threshold=80):
-    best_match = None
-    best_score = 0
-    
-    for entry in taxonomy_entries:
-        score = fuzz.ratio(input_str.lower(), entry.lower())
+def fuzzy_match(input_str, candidates, threshold=80):
+    best_match, best_score = None, 0
+    for candidate in candidates:
+        score = fuzz.ratio(input_str.lower(), candidate.lower())
         if score > best_score and score >= threshold:
             best_score = score
-            best_match = entry
-    
+            best_match = candidate
     return best_match, best_score / 100.0
 ```
 
@@ -321,71 +268,58 @@ def fuzzy_match(input_str, taxonomy_entries, threshold=80):
 ```python
 import re
 
-def split_combined_offences(category_text):
-    # Common separators for combined offences
-    separators = [' and ', ' & ', ' + ', ' / ', ', ']
-    
-    # Check for separators
+def split_combined_offences(text):
+    # Avoid splitting Home Office codes like "001/01"
+    if re.match(r'^\d{3}/\d{2}$', text.strip()):
+        return [text], False
+    separators = [' and ', ' & ', ' + ', ', ', '; ']
     for sep in separators:
-        if sep in category_text.lower():
-            parts = re.split(re.escape(sep), category_text, flags=re.IGNORECASE)
-            return [part.strip() for part in parts], True
-    
-    return [category_text], False
+        if sep.lower() in text.lower():
+            parts = re.split(re.escape(sep), text, flags=re.IGNORECASE)
+            return [p.strip() for p in parts], True
+    return [text], False
 ```
 
 ### Extracting Legal References
 
 ```python
 def extract_legislation(text):
-    # Pattern for Acts: "Name Act YEAR"
     act_pattern = r'([A-Z][A-Za-z\s]+Act\s+\d{4})'
-    
-    # Pattern for sections: "S.4", "Section 4", "s4"
     section_pattern = r'(?:S\.?|Section)\s*(\d+[A-Za-z]?)'
-    
     acts = re.findall(act_pattern, text)
     sections = re.findall(section_pattern, text, re.IGNORECASE)
-    
-    return {
-        'acts': acts,
-        'sections': sections
-    }
+    return {'acts': acts, 'sections': sections}
 ```
-
-## Output Format
-
-The output Excel/CSV should preserve ALL original columns and add the new standardised columns on the right. Use clear column headers and include a "README" sheet (for Excel) explaining the new columns and confidence scoring.
 
 ## Quality Checks
 
 Before presenting results:
-1. Verify all rows from input are in output
-2. Check that high-confidence mappings look reasonable
+1. Verify all rows from input appear in output
+2. Check high-confidence mappings look reasonable
 3. Ensure flagged items are genuinely uncertain
-4. Validate that combined offences are properly split
+4. Validate combined offences are properly split
 5. Confirm legal references are extracted correctly
 
-## Common Pitfalls to Avoid
+## Common Pitfalls
 
 - Don't assume consistent column names across FOI files
-- Don't ignore context from surrounding columns (e.g., incident counts, dates)
-- Don't map aggressively - it's better to flag for review than force a poor match
-- Don't lose the original data - always preserve it
-- Don't forget about edge cases: blank entries, "Unknown", "Other", "N/A"
+- Don't ignore context from surrounding columns (incident counts, dates)
+- Don't map aggressively — flag uncertain cases rather than force a poor match
+- Don't lose original data — always preserve all input columns
+- Don't forget edge cases: blank entries, "Unknown", "Other", "N/A"
 
 ## Edge Cases
 
-- **Blank or missing categories**: Flag as requiring review, don't map
-- **"Other" or "Unknown"**: Keep as-is, flag that taxonomy may be incomplete
-- **Historical offence names**: May not appear in modern taxonomy - flag for review
-- **Regional variations**: Scottish law differs from English/Welsh - be aware
+- **Blank or missing categories**: Flag for review, don't map
+- **"Other" or "Unknown"**: Keep as-is, note taxonomy may be incomplete
+- **Historical offence names**: May not appear in modern taxonomy — flag for review
+- **Regional variations**: Scottish law differs from English/Welsh — flag if suspected
 - **Free text descriptions**: May need more semantic understanding than exact matching
 
 ## Iterative Refinement
 
 After showing initial results:
-1. Ask user to review flagged uncertain mappings
+1. Ask the user to review flagged uncertain mappings
 2. Learn from user corrections
 3. Ask if there are systematic patterns to adjust
 4. Re-run with improved mappings if needed
