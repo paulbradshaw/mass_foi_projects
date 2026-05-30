@@ -23,7 +23,11 @@ AI is particularly well suited for getting a quick overview on a large collectio
 
 [NotebookLM](https://notebooklm.google.com/) is especially well suited for working with documents. It uses Google Gemini but you upload your documents to a 'notebook' and it will ground its responses in those (complete with linked page numbers so you can go straight to the source).
 
-Create a new notebook in NotebookLM and upload the FOI files (you can [use the files here](https://github.com/paulbradshaw/mass_foi_projects/tree/main/foi-requests)). Then type this prompt in the chat box in the middle:
+Create a new notebook in NotebookLM and upload the FOI files (you can [use the files here](https://github.com/paulbradshaw/mass_foi_projects/tree/main/foi-requests)). 
+
+*Note: it cannot handle XLSX files so you will need to export those as a PDF instead (or .txt if you are doing text analysis)*
+
+Then type this prompt in the chat box in the middle:
 
 ```
 OBJECTIVE: You are a journalist looking to combine data from multiple FOI responses into a single table that can be analysed to identify trends over time and compare categories or bodies. 
