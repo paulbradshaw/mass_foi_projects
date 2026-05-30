@@ -68,7 +68,10 @@ If that isn't provided, total crimes by hospital and year - or for all years.
 If that isn't provided, total crimes by outcome and year - or for all years.
 
 # Task
-Look at the attached PDF and suggest Python code that will work in Colab notebook. It should: 
+Look at the attached PDF and suggest Python code that will work in Colab notebook.
+Provide the code in two parts: one part to import the PDF (via an upload button in Colab)
+And a second part to extract the data and export/download it
+It should: 
 
 1. Import the PDF
 2. Identify the pages with data to extract. Follow this order of priority: 1) Detailed data on each individual crime, including information on category, outcome and/or location; 2) Aggregate data on crimes by category; 3) crimes by hospital; 4) crimes by outcome.
@@ -76,7 +79,7 @@ Look at the attached PDF and suggest Python code that will work in Colab noteboo
 4. Convert it into a single dataframe with headings from the first table (because where tables continue into subsequent pages they won’t have the headings on them)
 5. Clean the dataframe to use the field headings from that table, and remove any rows before that data, and 
 6. Export as a CSV
-7. Download the CSV
+7. Download the CSV from Colab to my machine
 
 ## Table structure [DELETE/ADAPT AS APPLICABLE]
 
