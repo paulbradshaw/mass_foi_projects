@@ -23,7 +23,10 @@ If that isn't provided, total crimes by hospital and year - or for all years.
 If that isn't provided, total crimes by outcome and year - or for all years.
 
 # Task
-Look at the attached PDF and suggest Python code that will work in Colab notebook. It should: 
+Look at the attached PDF and suggest Python code that will work in Colab notebook.
+Each line of code should be commented so that a non-coder can understand what is happening
+Prioritise explainability: use simple code over multiple lines rather than complex code condensed into a single line.
+The code should: 
 
 1. Import the PDF
 2. Identify the pages with data to extract. Follow this order of priority: 1) Detailed data on each individual crime, including information on category, outcome and/or location; 2) Aggregate data on crimes by category; 3) crimes by hospital; 4) crimes by outcome.
