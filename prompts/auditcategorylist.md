@@ -43,4 +43,6 @@ Add a column indicating confidence level in that category level (high, medium, l
 Apply a transparent, rule-based detection 
 Every flag needs to be reproducible and defensible for a journalist
 Alert me to any information or context which is missing, or any potential dangers to consider
+Also provide code that can be used in Colab to classify the data along the same lines.
+The code should be clearly commented so that a non-coder can understand what it does.
 ```
