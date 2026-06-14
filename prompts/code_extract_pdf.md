@@ -28,7 +28,7 @@ Each line of code should be commented so that a non-coder can understand what is
 Prioritise explainability: use simple code over multiple lines rather than complex code condensed into a single line.
 The code should: 
 
-1. Import the PDF
+1. Import the PDF (create an upload button in the notebook)
 2. Identify the pages with data to extract. Follow this order of priority: 1) Detailed data on each individual crime, including information on category, outcome and/or location; 2) Aggregate data on crimes by category; 3) crimes by hospital; 4) crimes by outcome.
 3. Extract that data into a series of dataframes. Store the force, filename and page number(s) in extra columns. Note that tables which continue into subsequent pages will start with a row of data, rather than the headings. 
 4. Convert it into a single dataframe with headings from the first table (because where tables continue into subsequent pages they won’t have the headings on them)
